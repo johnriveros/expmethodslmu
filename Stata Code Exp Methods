@@ -264,12 +264,50 @@ asdoc ttest BMI if year==1 & T==1 | T==0 & City==1, by(T) welch
 asdoc ttest BMI if year==1 & T==2 | T==0 & City==1, by(T) welch
 
 
+**
 **DiD setting
-gen T1_assi=0
-replace T1_assi=1 if T==1
+**
 
-gen T2_assi=0
-replace T2_assi=1 if T==2
+edit ID year Treatment Treatment2 T
 
+* Generating Dummies for each treatment on each year. 
+gen FMA_0=0
+replace FMA_0=1 if Treatment==1
+
+gen CTE_0=0
+replace CTE_0=1 if Treatment==2
+		// Previous are only for comparison of m1 and year 0. 
+* Post dummy. year 0 reference.
 gen post=0
-replace post=1 if year==0 | year==1
+replace post=1 if year>=0
+		
+
+reg GPA c.post##c.FMA_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1
+reg GPA c.post##c.FMA_0 c.post##c.CTE_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1
+
+reg Happy c.post##c.FMA_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, robust
+reg Happy c.post##c.FMA_0 c.post##c.CTE_0  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, cluster(ID)
+
+reg Stress c.post##c.FMA_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, robust
+reg Stress c.post##c.FMA_0 c.post##c.CTE_0  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, cluster(ID)
+
+* Dummies for each treatment on the next year
+gen FMA_1=0
+replace FMA_1=1 if Treatment2==1
+
+gen CTE_1=0
+replace CTE_1=1 if Treatment2==2
+
+* Post dummy year 1 as reference. 
+gen post_year_1 = 0
+replace post_year_1 =1 if year==1
+
+reg GPA c.post_year_1##c.FMA_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, robust
+reg GPA c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, robust
+
+reg Happy c.post_year_1##c.FMA_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0 , robust
+reg Happy c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, cluster(ID)
+
+reg Stress c.post_year_1##c.FMA_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, robust
+reg Stress c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, cluster(ID)
+
