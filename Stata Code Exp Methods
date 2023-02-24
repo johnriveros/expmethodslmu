@@ -52,6 +52,8 @@ replace T=2 if year==0 & Treatment==2
 replace T=1 if year==1 & Treatment2==1
 replace T=2 if year==1 & Treatment2==2
 
+encode time, gen(YEAR)
+
 * Check point data consistency of T as unique identificator
 edit ID year Treatment Treatment2 T
 
@@ -93,56 +95,67 @@ graph box Stress if time!="_M1" & City==1, over(T, relabel(1 "No treated" 2 "T1"
 	// Establishing path to store results
 	// cd "C:\Users\Michael\Documents\LMU\3rd Semester\Experimental Methods\Term Paper\Tables"
 	
-reg GPA i.T BMI Library Labor Campus Alcohol City Sex Civil if year==0
+reg GPA i.T L.GPA BMI Library Labor Campus Alcohol City Sex Civil if year==0
 		//outreg2 using regs_year0.xls
-reg Happy i.T BMI Library Labor Campus Alcohol City Sex Civil if year==0
+reg Happy i.T L.Happy BMI Library Labor Campus Alcohol City Sex Civil if year==0
 		//outreg2 using regs_year0.xls
-reg Stress i.T BMI Library Labor Campus Alcohol City Sex Civil if year==0
+reg Stress i.T L.Stress BMI Library Labor Campus Alcohol City Sex Civil if year==0
 		//outreg2 using regs_year0.xls
 
 		*Mediators: Library Campus Labor Alcohol BMI  year 0
-reg Library i.T Alcohol BMI Labor Campus City Sex Civil if year==0
+reg Library i.T L.Library Alcohol BMI Labor Campus City Sex Civil if year==0
 		//outreg2 using regs_year0_mediators.xls, replace
-reg Campus  i.T Alcohol BMI Library Labor City Sex Civil if year==0
+reg Campus  i.T L.Campus   Alcohol BMI Library Labor City Sex Civil if year==0
 		//outreg2 using regs_year0_mediators.xls
-reg Labor i.T   Alcohol BMI Library  Campus City Sex Civil if year==0
+reg Labor i.T L.Labor  Alcohol BMI Library  Campus City Sex Civil if year==0
 		//outreg2 using regs_year0_mediators.xls
-reg Alcohol i.T BMI Library Labor Campus City Sex Civil if year==0
+reg Alcohol i.T L.Alcohol BMI Library Labor Campus City Sex Civil if year==0
 		//outreg2 using regs_year0_mediators.xls
-reg BMI i.T Alcohol Library Labor Campus City Sex Civil if year==0
+reg BMI i.T L.BMI Alcohol Library Labor Campus City Sex Civil if year==0
 		//outreg2 using regs_year0_mediators.xls
 
 	*outcomes: GPA, Happy, Stress year 1
 	// Establishing path to store results
 	// cd "C:\Users\Michael\Documents\LMU\3rd Semester\Experimental Methods\Term Paper\Tables"
 	
-reg GPA i.T BMI Library Labor Campus Alcohol City Sex Civil if year==1
+reg GPA i.T L.GPA BMI Library Labor Campus Alcohol City Sex Civil if year==1
 		//outreg2 using regs_year1.xls
-reg Happy i.T BMI Library Labor Campus Alcohol City Sex Civil if year==1
+reg Happy i.T L.Happy BMI Library Labor Campus Alcohol City Sex Civil if year==1
 		//outreg2 using regs_year1.xls
-reg Stress i.T BMI Library Labor Campus Alcohol City Sex Civil if year==1
+reg Stress i.T L.Stress BMI Library Labor Campus Alcohol City Sex Civil if year==1
 		//outreg2 using regs_year1.xls
 
 		*Mediators: Library Campus Labor Alcohol BMI  year 0
-reg Library i.T Alcohol BMI Labor Campus City Sex Civil if year==1
+reg Library i.T L.Library  Alcohol BMI Labor Campus City Sex Civil if year==1
 		//outreg2 using regs_year1_mediators.xls, replace
-reg Campus  i.T Alcohol BMI Library Labor City Sex Civil if year==1
+reg Campus  i.T L.Campus Alcohol BMI Library Labor City Sex Civil if year==1
 		//outreg2 using regs_year1_mediators.xls
-reg Labor i.T   Alcohol BMI Library  Campus City Sex Civil if year==1
+reg Labor i.T L.Labor   Alcohol BMI Library  Campus City Sex Civil if year==1
 		//outreg2 using regs_year1_mediators.xls
-reg Alcohol i.T BMI Library Labor Campus City Sex Civil if year==1
+reg Alcohol i.T L.Alcohol BMI Library Labor Campus City Sex Civil if year==1
 		//outreg2 using regs_year1_mediators.xls
-reg BMI i.T Alcohol Library Labor Campus City Sex Civil if year==1
+reg BMI i.T L.BMI Alcohol Library Labor Campus City Sex Civil if year==1
 		//outreg2 using regs_year1_mediators.xls
 		
 	// full sample
-reg GPA i.T BMI Library Labor Campus Alcohol City Sex Civil 
+reg GPA i.T L.GPA BMI Library Labor Campus Alcohol City Sex Civil i.YEAR
 		//outreg2 using regs_fullsample.xls
-reg Happy i.T BMI Library Labor Campus Alcohol City Sex Civil
+reg Happy i.T L.Happy BMI Library Labor Campus Alcohol City Sex Civil i.YEAR
 		//outreg2 using regs_fullsample.xls
-reg Stress i.T BMI Library Labor Campus Alcohol City Sex Civil 
+reg Stress i.T L.Stress BMI Library Labor Campus Alcohol City Sex Civil  i.YEAR
 		//outreg2 using regs_fullsample.xls
 
+reg Library i.T L.Library  Alcohol BMI Labor Campus City Sex Civil i.YEAR
+		//outreg2 using regs_fullsample_mediators.xls, replace
+reg Campus  i.T L.Campus Alcohol BMI Library Labor City Sex Civil i.YEAR
+		//outreg2 using regs_fullsample_mediators.xls
+reg Labor i.T L.Labor   Alcohol BMI Library  Campus City Sex Civil i.YEAR
+		//outreg2 using regs_fullsample_mediators.xls
+reg Alcohol i.T L.Alcohol BMI Library Labor Campus City Sex Civil i.YEAR
+		//outreg2 using regs_fullsample_mediators.xls
+reg BMI i.T L.BMI Alcohol Library Labor Campus City Sex Civil i.YEAR
+		//outreg2 using regs_fullsample_mediators.xls
+		
 		
 		
 ** Ttest
@@ -167,4 +180,96 @@ ttest Stress if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) w
 ttest Stress if year==1 & T==2 | T==0 & City==1, by(T) welch
 ttest Stress if year==1 & T==1 | T==0 & City==1, by(T) welch
 
+** Mediators
 
+ttest Library if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+ttest Library if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+ttest Library if year==1 & T==1 | T==0 & City==1, by(T) welch
+ttest Library if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+ttest Campus if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+ttest Campus if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+ttest Campus if year==1 & T==1 | T==0 & City==1, by(T) welch
+ttest Campus if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+ttest Labor if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+ttest Labor if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+ttest Labor if year==1 & T==1 | T==0 & City==1, by(T) welch
+ttest Labor if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+ttest Alcohol if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+ttest Alcohol if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+ttest Alcohol if year==1 & T==1 | T==0 & City==1, by(T) welch
+ttest Alcohol if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+ttest BMI if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+ttest BMI if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+ttest BMI if year==1 & T==1 | T==0 & City==1, by(T) welch
+ttest BMI if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+ *** Export
+asdoc ttest GPA if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest GPA if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest GPA if year==1 & T==1 | T==0 & City==1, by(T) welch
+asdoc ttest GPA if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+
+asdoc ttest Happy if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest Happy if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest Happy if year==1 & T==2 | T==0 & City==1, by(T) welch
+asdoc ttest Happy if year==1 & T==1 | T==0 & City==1, by(T) welch
+
+
+asdoc ttest Stress if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest Stress if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest Stress if year==1 & T==2 | T==0 & City==1, by(T) welch
+asdoc ttest Stress if year==1 & T==1 | T==0 & City==1, by(T) welch
+
+asdoc ttest Library if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest Library if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest Library if year==1 & T==1 | T==0 & City==1, by(T) welch
+asdoc ttest Library if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+asdoc ttest Campus if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest Campus if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest Campus if year==1 & T==1 | T==0 & City==1, by(T) welch
+asdoc ttest Campus if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+asdoc ttest Labor if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest Labor if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest Labor if year==1 & T==1 | T==0 & City==1, by(T) welch
+asdoc ttest Labor if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+asdoc ttest Alcohol if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest Alcohol if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest Alcohol if year==1 & T==1 | T==0 & City==1, by(T) welch
+asdoc ttest Alcohol if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+asdoc ttest BMI if year==0 & Treatment==2 | Treatment==0 & City==1, by(Treatment) welch
+asdoc ttest BMI if year==0 & Treatment==1 | Treatment==0 & City==1, by(Treatment) welch
+
+asdoc ttest BMI if year==1 & T==1 | T==0 & City==1, by(T) welch
+asdoc ttest BMI if year==1 & T==2 | T==0 & City==1, by(T) welch
+
+
+**DiD setting
+gen T1_assi=0
+replace T1_assi=1 if T==1
+
+gen T2_assi=0
+replace T2_assi=1 if T==2
+
+gen post=0
+replace post=1 if year==0 | year==1
