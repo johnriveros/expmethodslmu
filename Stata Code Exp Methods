@@ -264,10 +264,7 @@ asdoc ttest BMI if year==1 & T==1 | T==0 & City==1, by(T) welch
 asdoc ttest BMI if year==1 & T==2 | T==0 & City==1, by(T) welch
 
 
-**
 **DiD setting
-**
-
 edit ID year Treatment Treatment2 T
 
 * Generating Dummies for each treatment on each year. 
@@ -281,16 +278,20 @@ replace CTE_0=1 if Treatment==2
 gen post=0
 replace post=1 if year>=0
 		
+	// Establishing path to store results
+	// cd "C:\Users\Michael\Documents\LMU\3rd Semester\Experimental Methods\Term Paper\Tables"
+	// dummies of year by i.YEAR were deleted as the post dummny capture its effects.
+	// Note: c.var1##c.var2 creates a dummy for var1, var2 and an interaction term between var1 and var2. 
+		
+reg GPA c.post##c.FMA_0 c.post##c.CTE_0 BMI Library Labor Campus Alcohol City Sex Civil if year<1
+		//outreg2 using DID_YEAR0.xls
 
-reg GPA c.post##c.FMA_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1
-reg GPA c.post##c.FMA_0 c.post##c.CTE_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1
+reg Happy c.post##c.FMA_0 c.post##c.CTE_0  BMI Library Labor Campus Alcohol City Sex Civil if year<1, cluster(ID)
+		//outreg2 using DID_YEAR0.xls
 
-reg Happy c.post##c.FMA_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, robust
-reg Happy c.post##c.FMA_0 c.post##c.CTE_0  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, cluster(ID)
-
-reg Stress c.post##c.FMA_0 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, robust
-reg Stress c.post##c.FMA_0 c.post##c.CTE_0  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year<1, cluster(ID)
-
+reg Stress c.post##c.FMA_0 c.post##c.CTE_0  BMI Library Labor Campus Alcohol City Sex Civil if year<1, cluster(ID)
+		//outreg2 using DID_YEAR0.xls
+		
 * Dummies for each treatment on the next year
 gen FMA_1=0
 replace FMA_1=1 if Treatment2==1
@@ -302,12 +303,12 @@ replace CTE_1=1 if Treatment2==2
 gen post_year_1 = 0
 replace post_year_1 =1 if year==1
 
-reg GPA c.post_year_1##c.FMA_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, robust
-reg GPA c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, robust
 
-reg Happy c.post_year_1##c.FMA_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0 , robust
-reg Happy c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, cluster(ID)
+reg GPA c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1 BMI Library Labor Campus Alcohol City Sex Civil if year>=0, robust
+		//outreg2 using DID_YEAR1.xls
 
-reg Stress c.post_year_1##c.FMA_1 BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, robust
-reg Stress c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1  BMI Library Labor Campus Alcohol City Sex Civil i.YEAR if year>=0, cluster(ID)
+reg Happy c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1  BMI Library Labor Campus Alcohol City Sex Civil if year>=0, cluster(ID)
+		//outreg2 using DID_YEAR1.xls
 
+reg Stress c.post_year_1##c.FMA_1 c.post_year_1##c.CTE_1  BMI Library Labor Campus Alcohol City Sex Civil if year>=0, cluster(ID)
+		//outreg2 using DID_YEAR1.xls
